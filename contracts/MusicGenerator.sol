@@ -22,6 +22,9 @@ contract MusicGenerator {
     // Event of when someone listens to a song
     event Listen(uint songId, uint priceToListen);
     
+    // Event of when someone wants to see the list of songs
+    event ListSongs();
+    
     // Song struct
     struct Song {
         address owner;
@@ -50,6 +53,7 @@ contract MusicGenerator {
         return songOwnership[_songId].songHash;
     }
     
+    // function used to get details of a song
     function getSongInfo(uint _songId) public view returns (address, uint, uint, bytes32) {
         return (songOwnership[_songId].owner,
                 songOwnership[_songId].price,
@@ -58,13 +62,17 @@ contract MusicGenerator {
     }
     
     // function to listen to song
-    function listenToSong(uint _songId) public payable returns (bool) {
+    function listenToSong(uint _songId) public payable returns (bytes32) {
         require(msg.value == songOwnership[_songId].priceToListen);
         Listen(_songId, songOwnership[_songId].priceToListen);
-        return true;
+        return songOwnership[_songId].songHash;
     }
     
     
+    // fallback function
+    function() public payable {}
+    
+    // Owner of the contract can kill the contract
     function kill() public {
         if(msg.sender == owner){
             selfdestruct(owner);
